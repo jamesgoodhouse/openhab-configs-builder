@@ -30,13 +30,6 @@ build_configs () {
            --exclude='.gitignore' \
            --datasource="configs=$config_yaml_path" \
            --datasource="secrets=$secrets_yaml_path"
-
-  # openhab seems a little happier (in its logs at least) when all of these dirs exist
-  local -r default_conf_dirs=(html icons items persistence rules scripts services sitemaps sounds things transform)
-
-  for d in "${default_conf_dirs[@]}"; do
-    mkdir -p "$built_configs_path/$d"
-  done
 }
 
 # https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700
