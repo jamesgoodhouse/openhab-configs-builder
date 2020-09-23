@@ -24,10 +24,10 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: setup QEMU
-      uses: docker/setup-qemu-action@v1
-      with:
-        platforms: all
+    # - name: setup QEMU
+    #   uses: docker/setup-qemu-action@v1
+    #   with:
+    #     platforms: all
 
     - name: setup Docker Buildx
       id: buildx
