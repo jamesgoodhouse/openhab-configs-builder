@@ -1,0 +1,64 @@
+name: Publish Docker Image
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+    - master
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+    - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+env:
+  IMAGE_NAME: jgoodhouse/openhab-templatizer
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: setup QEMU
+      uses: docker/setup-qemu-action@v1
+      with:
+        platforms: all
+
+    - name: setup Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1
+      with:
+        version: latest
+
+    - name: Builder instance name
+      run: echo ${{ steps.buildx.outputs.name }}
+    -
+      name: Available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
+
+    # - name: build image
+    #   run: docker build . --file Dockerfile --tag $IMAGE_NAME
+    #
+    # - name: log into Docker Hub
+    #   run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u jgoodhouse --password-stdin
+    #
+    # - name: push image Docker Hub
+    #   run: |
+    #     IMAGE_ID=$IMAGE_NAME
+    #     # Change all uppercase to lowercase
+    #     IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+    #     # Strip git ref prefix from version
+    #     VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+    #     # Strip "v" prefix from tag name
+    #     [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+    #     # Use Docker `latest` tag convention
+    #     [ "$VERSION" == "master" ] && VERSION=latest
+    #     echo IMAGE_ID=$IMAGE_ID
+    #     echo VERSION=$VERSION
+    #     docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+    #     docker push $IMAGE_ID:$VERSION
