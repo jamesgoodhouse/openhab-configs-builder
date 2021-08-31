@@ -1,5 +1,5 @@
-ARG ALPINE_VERSION=3.12
-ARG GOMPLATE_VERSION=3.8.0
+ARG ALPINE_VERSION=3.14
+ARG GOMPLATE_VERSION=3.9.0
 
 ################################################################################
 
