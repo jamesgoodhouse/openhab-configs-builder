@@ -28,8 +28,7 @@ build_configs () {
            --output-map="/$built_configs_path/{{ .in | strings.ReplaceAll \".tmpl\" \" \" }}" \
            --exclude='*.yaml' \
            --exclude='.gitignore' \
-           --datasource="configs=$config_yaml_path" \
-           --datasource="secrets=$secrets_yaml_path"
+           --datasource="configs=merge:$config_yaml_path|$secrets_yaml_path"
 }
 
 # https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700
