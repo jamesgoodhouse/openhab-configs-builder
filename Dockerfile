@@ -28,6 +28,7 @@ FROM hairyhenderson/gomplate:v${GOMPLATE_VERSION}-slim AS gomplate
 
 FROM alpine:${ALPINE_VERSION}
 ARG COLOR_LOGGER_VERSION
+ENV SOPS_AGE_KEY_FILE=/age/key.txt
 RUN apk add --no-cache bash git less openssh rsync && \
     wget -O /usr/local/lib/color-logger.bash https://raw.githubusercontent.com/swyckoff/color-logger-bash/v${COLOR_LOGGER_VERSION}/color-logger.bash
 COPY builder.sh /builder.sh
