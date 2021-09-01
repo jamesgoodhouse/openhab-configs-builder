@@ -164,10 +164,8 @@ main () {
   if [ ! -d "$configs_repo_path"/.git ]; then
     clone_repo
     configs_need_building=true
-  else
-    if pull_configs; then
-      configs_need_building=true
-    fi
+  elif pull_configs; then
+    configs_need_building=true
   fi
 
   if yamls_changed; then
