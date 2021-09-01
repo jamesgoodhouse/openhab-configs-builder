@@ -12,14 +12,16 @@ readonly built_configs_path=${BUILT_CONFIGS_PATH-/built_configs}
 readonly final_configs_path=${FINAL_CONFIGS_PATH-/final_configs}
 readonly configs_repo_branch=${CONFIGS_REPO_BRANCH-master}
 readonly configs_repo_path=${CONFIGS_REPO_PATH-/configs_repo}
-readonly config_yaml_path=${CONFIG_YAML_PATH-/yamls/config/config.yaml}
-readonly secrets_yaml_path=${SECRETS_YAML_PATH-/yamls/secrets/secrets.yaml}
+
+readonly config_yaml_path=${CONFIG_YAML_PATH-${CONFIGS_REPO_PATH}/config.yaml}
+readonly encrypted_secrets_yaml_path=${ENCRYPTED_SECRETS_YAML_PATH-${CONFIGS_REPO_PATH}/secrets.enc.yaml}
+readonly decrypted_secrets_yaml_path=${DECRYPTED_SECRETS_YAML_PATH-${CONFIGS_REPO_PATH}/secrets.yaml}
 
 readonly previous_error_flag_file="$final_configs_path/.previous_error"
 readonly existing_config_yaml_checksum_path="$final_configs_path/.configs.yaml.sha256sum"
-readonly existing_secrets_yaml_checksum_path="$final_configs_path/.secrets.yaml.sha256sum"
+readonly existing_encrypted_secrets_yaml_checksum_path="$final_configs_path/.secrets.enc.yaml.sha256sum"
 readonly new_config_yaml_checksum_path="$built_configs_path/.configs.yaml.sha256sum"
-readonly new_secrets_yaml_checksum_path="$built_configs_path/.secrets.yaml.sha256sum"
+readonly new_encrypted_secrets_yaml_checksum_path="$built_configs_path/.secrets.enc.yaml.sha256sum"
 
 build_configs () {
   info 'building configs'
@@ -28,7 +30,7 @@ build_configs () {
            --output-map="/$built_configs_path/{{ .in | strings.ReplaceAll \".tmpl\" \" \" }}" \
            --exclude='*.yaml' \
            --exclude='.gitignore' \
-           --datasource="configs=merge:file://$config_yaml_path|file://$secrets_yaml_path"
+           --datasource="configs=merge:file://$config_yaml_path|file://$decrypted_secrets_yaml_path"
 }
 
 # https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700
@@ -60,7 +62,11 @@ copy_configs () {
 
 create_yaml_checksums () {
   checksum "$config_yaml_path" > "$new_config_yaml_checksum_path"
-  checksum "$secrets_yaml_path" > "$new_secrets_yaml_checksum_path"
+  checksum "$encrypted_secrets_yaml_path" > "$new_encrypted_secrets_yaml_checksum_path"
+}
+
+decrypt_secrets () {
+  sops -d "$encrypted_secrets_yaml_path" > "$decrypted_secrets_yaml_path"
 }
 
 get_configs_git_sha () {
@@ -81,8 +87,8 @@ had_previous_error () {
   return 1
 }
 
-has_secrets_yaml_changed () {
-  has_yaml_changed "$new_secrets_yaml_checksum_path" "$existing_secrets_yaml_checksum_path"
+has_encrypted_secrets_yaml_changed () {
+  has_yaml_changed "$new_encrypted_secrets_yaml_checksum_path" "$existing_encrypted_secrets_yaml_checksum_path"
 }
 
 has_yaml_changed () {
@@ -123,9 +129,9 @@ setup () {
     touch "$existing_config_yaml_checksum_path"
   fi
 
-  if [ ! -f "$existing_secrets_yaml_checksum_path" ]; then
-    debug "'$existing_secrets_yaml_checksum_path' not found; creating it"
-    touch "$existing_secrets_yaml_checksum_path"
+  if [ ! -f "$existing_encrypted_secrets_yaml_checksum_path" ]; then
+    debug "'$existing_encrypted_secrets_yaml_checksum_path' not found; creating it"
+    touch "$existing_encrypted_secrets_yaml_checksum_path"
   fi
 }
 
@@ -135,12 +141,12 @@ yamls_changed () {
   create_yaml_checksums
 
   if has_config_yaml_changed; then
-    info "'config.yaml' has changed"
+    info "'$config_yaml_path' has changed"
     changed=true
   fi
 
-  if has_secrets_yaml_changed; then
-    info "'secrets.yaml' has changed"
+  if has_encrypted_secrets_yaml_changed; then
+    info "'$encrypted_secrets_yaml_path' has changed"
     changed=true
   fi
 
@@ -177,6 +183,7 @@ main () {
   fi
 
   if [ "$configs_need_building" = true ]; then
+    decrypt_secrets
     build_configs
     copy_configs
     success 'done'
