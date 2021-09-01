@@ -13,9 +13,9 @@ readonly final_configs_path=${FINAL_CONFIGS_PATH-/final_configs}
 readonly configs_repo_branch=${CONFIGS_REPO_BRANCH-master}
 readonly configs_repo_path=${CONFIGS_REPO_PATH-/configs_repo}
 
-readonly config_yaml_path=${CONFIG_YAML_PATH-${CONFIGS_REPO_PATH}/config.yaml}
-readonly encrypted_secrets_yaml_path=${ENCRYPTED_SECRETS_YAML_PATH-${CONFIGS_REPO_PATH}/secrets.enc.yaml}
-readonly decrypted_secrets_yaml_path=${DECRYPTED_SECRETS_YAML_PATH-${CONFIGS_REPO_PATH}/secrets.yaml}
+readonly config_yaml_path=${CONFIG_YAML_PATH-${configs_repo_path}/config.yaml}
+readonly encrypted_secrets_yaml_path=${ENCRYPTED_SECRETS_YAML_PATH-${configs_repo_path}/secrets.enc.yaml}
+readonly decrypted_secrets_yaml_path=${DECRYPTED_SECRETS_YAML_PATH-${configs_repo_path}/secrets.yaml}
 
 readonly previous_error_flag_file="$final_configs_path/.previous_error"
 readonly existing_config_yaml_checksum_path="$final_configs_path/.configs.yaml.sha256sum"
