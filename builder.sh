@@ -46,7 +46,7 @@ checksum () {
 }
 
 clone_repo () {
-  info 'cloning configs repo'
+  info "cloning configs repo '$CONFIGS_REPO_URL' to '$configs_repo_path'"
 
   git clone "$CONFIGS_REPO_URL" --depth 1 --single-branch --branch "$configs_repo_branch" "$configs_repo_path"
 }
@@ -66,6 +66,8 @@ create_yaml_checksums () {
 }
 
 decrypt_secrets () {
+  info "decrypting '$encrypted_secrets_yaml_path' to '$decrypted_secrets_yaml_path'"
+
   sops -d "$encrypted_secrets_yaml_path" > "$decrypted_secrets_yaml_path"
 }
 
