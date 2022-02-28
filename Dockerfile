@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=3.15
 ARG COLOR_LOGGER_VERSION=0.9.0
 ARG GOLANG_VERSION=1.17
-ARG GOMPLATE_VERSION=3.10.0
+ARG GOMPLATE_TAG=v3.10.0-alpine
 ARG SOPS_VERSION=3.7.1
 
 ################################################################################
@@ -22,7 +22,7 @@ RUN go get -d -v ./... && \
 ################################################################################
 
 # would skip this but COPY --from doesn't do interpolation of ARGs
-FROM hairyhenderson/gomplate:v${GOMPLATE_VERSION}-slim AS gomplate
+FROM hairyhenderson/gomplate:${GOMPLATE_TAG} AS gomplate
 
 ################################################################################
 
