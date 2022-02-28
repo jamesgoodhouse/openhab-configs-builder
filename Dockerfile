@@ -32,6 +32,6 @@ ENV SOPS_AGE_KEY_FILE=/age/key.txt
 RUN apk add --no-cache bash git less openssh rsync && \
     wget -O /usr/local/lib/color-logger.bash https://raw.githubusercontent.com/swyckoff/color-logger-bash/v${COLOR_LOGGER_VERSION}/color-logger.bash
 COPY builder.sh /builder.sh
-COPY --from=gomplate /gomplate /usr/local/bin/gomplate
+COPY --from=gomplate /bin/gomplate /usr/local/bin/gomplate
 COPY --from=sops /go/bin/sops /usr/local/bin/sops
 ENTRYPOINT ["/builder.sh"]
